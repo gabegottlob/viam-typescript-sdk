@@ -91,6 +91,8 @@ import {
   DataPipelineRunStatus,
   ListDataPipelineRunsRequest,
   ListDataPipelineRunsResponse,
+  RenameDataPipelineRequest,
+  RenameDataPipelineResponse,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
 vi.mock('../gen/app/data/v1/data_pb_service');
@@ -1710,6 +1712,30 @@ describe('DataPipelineClient tests', () => {
       const page = await subject().listDataPipelineRuns(pipelineId, pageSize);
       const nextPage = await page.nextPage();
       expect(nextPage.runs).toEqual([]);
+    });
+  });
+
+  describe('renameDataPipeline tests', () => {
+    let capReq: RenameDataPipelineRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataPipelinesService, {
+          renameDataPipeline: (req: RenameDataPipelineRequest) => {
+            capReq = req;
+            return new RenameDataPipelineResponse();
+          },
+        });
+      });
+    });
+
+    it('rename data pipeline', async () => {
+      const expectedRequest = new RenameDataPipelineRequest({
+        id: pipelineId,
+        name: 'newName',
+      });
+
+      await subject().renameDataPipeline(pipelineId, 'newName');
+      expect(capReq).toStrictEqual(expectedRequest);
     });
   });
 });

@@ -1474,6 +1474,28 @@ export class DataClient {
   }
 
   /**
+   * Renames a data pipeline by its ID.
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.renameDataPipeline(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'my-new-pipeline-name'
+   * );
+   * ```
+   *
+   * @param pipelineId The ID of the data pipeline
+   * @param newName The new name for the data pipeline
+   */
+  async renameDataPipeline(pipelineId: string, newName: string): Promise<void> {
+    await this.dataPipelinesClient.renameDataPipeline({
+      id: pipelineId,
+      name: newName,
+    });
+  }
+
+  /**
    * List all runs of a data pipeline.
    *
    * @example
