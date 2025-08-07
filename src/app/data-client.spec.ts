@@ -87,6 +87,8 @@ import {
   CreateDataPipelineResponse,
   DeleteDataPipelineRequest,
   DeleteDataPipelineResponse,
+  RenameDataPipelineRequest,
+  RenameDataPipelineResponse,
   DataPipelineRun,
   DataPipelineRunStatus,
   ListDataPipelineRunsRequest,
@@ -408,9 +410,14 @@ describe('DataClient tests', () => {
             capReq = req;
             if (!once) {
               once = true;
-              return binDataResponse;
+              const response = new BinaryDataByFilterResponse();
+              response.deletedCount =
+                req.includeInternalData ? BigInt(20) : BigInt(10);
+              return response;
             }
-            return new BinaryDataByFilterResponse();
+            return new BinaryDataByFilterResponse({
+              deletedCount: BigInt(10),
+            });
           },
         });
       });
@@ -1710,6 +1717,30 @@ describe('DataPipelineClient tests', () => {
       const page = await subject().listDataPipelineRuns(pipelineId, pageSize);
       const nextPage = await page.nextPage();
       expect(nextPage.runs).toEqual([]);
+    });
+  });
+
+  describe('renameDataPipeline tests', () => {
+    let capReq: RenameDataPipelineRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataPipelinesService, {
+          renameDataPipeline: (req: RenameDataPipelineRequest) => {
+            capReq = req;
+            return new RenameDataPipelineResponse();
+          },
+        });
+      });
+    });
+
+    it('rename data pipeline', async () => {
+      const expectedRequest = new RenameDataPipelineRequest({
+        id: pipelineId,
+        name: pipelineName,
+      });
+
+      await subject().renameDataPipeline(pipelineId, pipelineName);
+      expect(capReq).toStrictEqual(expectedRequest);
     });
   });
 });
