@@ -30,6 +30,8 @@ import {
 import {
   DataPipeline,
   DataPipelineRun,
+  RenameDataPipelineRequest,
+  RenameDataPipelineResponse,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
 
 export type FilterOptions = Partial<Filter> & {
@@ -1470,6 +1472,28 @@ export class DataClient {
   async deleteDataPipeline(pipelineId: string): Promise<void> {
     await this.dataPipelinesClient.deleteDataPipeline({
       id: pipelineId,
+    });
+  }
+
+  /**
+   * Renames a data pipeline.
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.renameDataPipeline(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'my-new-pipeline-name'
+   * );
+   * ```
+   *
+   * @param pipelineId The ID of the data pipeline
+   * @param name The new name of the data pipeline
+   */
+  async renameDataPipeline(pipelineId: string, name: string): Promise<void> {
+    await this.dataPipelinesClient.renameDataPipeline({
+      id: pipelineId,
+      name,
     });
   }
 
